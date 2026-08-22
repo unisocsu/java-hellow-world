@@ -24,4 +24,4 @@ jobs:
 
     # 3. ביצוע קומפילציה לקובץ ה-Java
     - name: Compile Java file
-      run: javac hellow-world.java
+      run: javac hellowworld.java
