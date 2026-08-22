@@ -1,9 +1,7 @@
-name: Java CI
+name: Build and Package Java
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -11,24 +9,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. משיכת הקוד מהריפוזיטורי
+    # 1. משיכת הקוד
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2. הגדרת סביבת Java (JDK)
+    # 2. הגדרת סביבת Java
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # 3. ביצוע קומפילציה לקובץ ה-Java
+    # 3. קומפילציה לקובץ ה-Java
     - name: Compile Java file
       run: javac hellowworld.java
 
-    # 4. העלאת קובץ ה-Class כאורטיפקט
-    - name: Upload Artifact
+    # 4. יצירת קובץ JAR להפעלה
+    - name: Create JAR file
+      run: jar cfe hellowworld.jar hellowworld hellowworld.class
+
+    # 5. העלאת קובץ ה-JAR כאורטיפקט להורדה
+    - name: Upload JAR Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: compiled-java-file
-        path: hellowworld.class
+        name: runnable-jar
+        path: hellowworld.jar
