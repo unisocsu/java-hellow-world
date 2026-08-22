@@ -25,3 +25,10 @@ jobs:
     # 3. ביצוע קומפילציה לקובץ ה-Java
     - name: Compile Java file
       run: javac hellowworld.java
+
+    # 4. העלאת קובץ ה-Class כאורטיפקט
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-java-file
+        path: hellowworld.class
