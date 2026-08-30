@@ -1,5 +1,4 @@
-```yaml
-name: Build Gemini CLI for KitKat
+name: Build Gemini CLI
 
 on:
   workflow_dispatch:
@@ -12,52 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Install Android Build Tools
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Build Tools
-        run: |
-          sdkmanager "platform-tools" "build-tools;35.0.0"
+      - name: Install Android Build Tools
+        run: sdkmanager "build-tools;35.0.0"
 
       - name: Compile Java
         run: |
           mkdir -p build/classes
-          javac --release 8 \
-            -d build/classes \
-            GeminiCli.java
+          javac --release 8 -d build/classes GeminiCli.java
 
-      - name: Convert Java bytecode to DEX
+      - name: Convert to DEX
         run: |
           mkdir -p build/dex
-
           "$ANDROID_HOME/build-tools/35.0.0/d8" \
             --min-api 19 \
             --output build/dex \
             build/classes/GeminiCli.class
 
-      - name: Create KitKat JAR
+      - name: Create JAR
         run: |
-          mkdir -p build/jar
+          cd build/dex
+          zip ../../GeminiCli-KitKat.jar classes.dex
 
-          cp build/dex/classes.dex build/jar/GeminiCli.dex
-
-          cd build/jar
-          zip -j ../../GeminiCli-KitKat.jar GeminiCli.dex
-
-      - name: Upload artifact
+      - name: Upload GeminiCli
         uses: actions/upload-artifact@v4
         with:
           name: GeminiCli-KitKat
-          path: |
-            build/dex/classes.dex
-            GeminiCli-KitKat.jar
+          path: GeminiCli-KitKat.jar
