@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Android Build Tools
         run: |
-          yes | sdkmanager --licenses
+          yes | sdkmanager --licenses || true
           sdkmanager "build-tools;28.0.3"
 
       - name: Compile Java 8
@@ -46,11 +46,23 @@ jobs:
             --output=build/dex/classes.dex \
             build/classes
 
-      - name: Inspect DEX
+      - name: Print all DEX classes
         run: |
+          echo "========================================"
+          echo "        CLASSES INSIDE classes.dex"
+          echo "========================================"
+
+          "$ANDROID_HOME/build-tools/28.0.3/dexdump" \
+            build/dex/classes.dex |
+            grep "Class descriptor" |
+            sed "s/.*Class descriptor *: *//" |
+            sort -u
+
+          echo "========================================"
+          echo "        DEX INFORMATION"
+          echo "========================================"
+
           ls -lh build/dex/classes.dex
-          file build/dex/classes.dex
-          unzip -l build/dex/classes.dex || true
 
       - name: Create JAR
         run: |
